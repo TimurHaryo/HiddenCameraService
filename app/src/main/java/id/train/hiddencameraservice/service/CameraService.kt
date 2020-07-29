@@ -22,12 +22,22 @@ import com.androidhiddencamera.config.CameraImageFormat
 import com.androidhiddencamera.config.CameraResolution
 import com.androidhiddencamera.config.CameraRotation
 import id.train.hiddencameraservice.R
+import id.train.hiddencameraservice.utils.launchIO
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 
 
 class CameraService : HiddenCameraService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        launchIO { captureSecretly() }
+
+        return Service.START_STICKY
+    }
+
+    private suspend fun captureSecretly() {
         if (ActivityCompat.checkSelfPermission(
                 this@CameraService,
                 Manifest.permission.CAMERA
@@ -42,18 +52,18 @@ class CameraService : HiddenCameraService() {
                     .setImageRotation(CameraRotation.ROTATION_270)
                     .build()
 
-                startCamera(cameraConfig)
-                Handler().postDelayed({
-                    takePicture()
-                }, 1000L)
+                withContext(Dispatchers.Main) {
+                    startCamera(cameraConfig)
+                    Handler().postDelayed({
+                        takePicture()
+                    }, 1000L)
+                }
             } else {
                 HiddenCameraUtils.openDrawOverPermissionSetting(this@CameraService)
             }
         } else {
             mICameraCallback?.requestCameraPermission(Manifest.permission.CAMERA)
         }
-
-        return Service.START_NOT_STICKY
     }
 
     override fun onCameraError(errorCode: Int) {

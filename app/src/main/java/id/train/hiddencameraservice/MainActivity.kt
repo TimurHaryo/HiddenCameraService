@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity(), ICameraCallback {
             val interval = 1000L
             val pendingIntent = PendingIntent.getBroadcast(this, 0, alarm, 0)
             val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime(), interval, pendingIntent)
+            alarmManager.setRepeating(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime(), interval, pendingIntent)
         }
     }
 
